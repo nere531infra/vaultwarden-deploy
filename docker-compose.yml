@@ -10,7 +10,7 @@ services:
     volumes:
       - type: volume
         source: vaultwarden_data
-        target: ./data
+        target: /data
     expose:
       - 80
     networks:
