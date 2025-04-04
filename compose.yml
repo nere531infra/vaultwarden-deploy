@@ -1,0 +1,41 @@
+services:
+  vaultwarden:
+    image: vaultwarden/server:1.33.0
+    container_name: vaultwarden__vaultwarden
+    restart: unless-stopped
+    environment:
+      SIGNUPS_ALLOWED: "false"
+      ADMIN_TOKEN: ${ADMIN_TOKEN}
+    volumes:
+      - type: volume
+        source: vaultwarden_data
+        target: /data
+    expose:
+      - 80
+    networks:
+      - outband
+    deploy:
+      resources:
+        limits:
+          memory: 512m
+  cloudflared:
+    image: cloudflare/cloudflared:2025.4.0
+    hostname: cloudflared
+    container_name: vaultwarden__cloudflared
+    restart: unless-stopped
+    environment:
+      TUNNEL_METRICS: 0.0.0.0:9126
+      TUNNEL_LOGFILE: /dev/stdout
+    command: tunnel run --token ${TUNNEL_TOKEN}
+    networks:
+      - outband
+    deploy:
+      resources:
+        limits:
+          memory: 128m
+volumes:
+  vaultwarden_data:
+    name: vaultwarden__vaultwarden_data
+networks:
+  outband:
+    name: vaultwarden__outband
